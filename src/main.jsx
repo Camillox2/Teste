@@ -4,6 +4,7 @@ import App from './App.jsx'
 import AssistantYR from './AssistantYR.jsx'
 import './styles.css'
 import './mobile-fixes.css'
+import './hero-brand.css'
 import './assistant.css'
 
 createRoot(document.getElementById('root')).render(
