@@ -1,0 +1,216 @@
+/* Correções finais de experiência: hero mobile + ação flutuante IA/WhatsApp */
+
+/* O conteúdo principal do hero deve ficar visível imediatamente. */
+.hero-copy[data-reveal] {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+@media (max-width: 1080px) {
+  .hero-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  .hero-copy {
+    order: 1 !important;
+    position: relative;
+    z-index: 5;
+    width: 100%;
+    min-height: 0 !important;
+  }
+
+  .hero-visual {
+    order: 2 !important;
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero {
+    min-height: 0 !important;
+    padding: 34px 0 32px !important;
+    overflow: hidden;
+  }
+
+  .hero-grid {
+    gap: 28px !important;
+  }
+
+  .hero-copy {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .hero-copy .kicker {
+    margin: 0 0 14px;
+    font-size: 9px;
+    letter-spacing: .11em;
+  }
+
+  .hero-copy h1 {
+    margin-top: 0 !important;
+    max-width: 92%;
+    font-size: clamp(39px, 11.6vw, 54px) !important;
+    line-height: .98 !important;
+  }
+
+  .hero-copy > p {
+    margin-top: 18px !important;
+    max-width: 94%;
+  }
+
+  .hero-actions {
+    margin-top: 24px !important;
+  }
+
+  .hero-proof {
+    margin-top: 23px !important;
+  }
+
+  /* A marca fica decorativa atrás do texto, sem empurrar o conteúdo. */
+  .hero::before {
+    width: 175px !important;
+    right: -58px !important;
+    top: 68px !important;
+    opacity: .17 !important;
+  }
+
+  .hero::after {
+    width: 96px !important;
+    right: 4% !important;
+    top: 150px !important;
+    opacity: .48 !important;
+  }
+
+  .hero-glow--one {
+    width: 225px !important;
+    height: 225px !important;
+    right: -92px !important;
+    top: -36px !important;
+    opacity: .72;
+  }
+
+  .hero-glow--two {
+    width: 145px !important;
+    height: 145px !important;
+    left: -74px !important;
+    bottom: 8% !important;
+    opacity: .5;
+  }
+}
+
+/* Posição única para o botão que alterna entre IA e WhatsApp. */
+.yr-floating-action {
+  position: fixed;
+  z-index: 72;
+  right: 18px;
+  bottom: calc(18px + env(safe-area-inset-bottom));
+  animation: yrFloatingSwap .32s cubic-bezier(.2,.8,.2,1) both;
+}
+
+.yr-floating-action .yr-ai-launcher,
+.yr-whatsapp-launcher {
+  position: relative !important;
+  right: auto !important;
+  bottom: auto !important;
+}
+
+.yr-whatsapp-launcher {
+  border: 0;
+  border-radius: 999px;
+  padding: 9px 14px 9px 9px;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: white;
+  background: linear-gradient(135deg, #128c7e 0%, #25d366 100%);
+  box-shadow: 0 18px 44px rgba(18,140,126,.28);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.yr-whatsapp-launcher:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 22px 50px rgba(18,140,126,.34);
+}
+
+.yr-whatsapp-launcher > span {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: white;
+  background: rgba(255,255,255,.16);
+}
+
+.yr-whatsapp-launcher strong {
+  font-size: 12px;
+}
+
+.yr-whatsapp-launcher small {
+  padding: 3px 6px;
+  border-radius: 999px;
+  background: rgba(6,48,36,.26);
+  color: #fff;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: .06em;
+}
+
+@keyframes yrFloatingSwap {
+  from { opacity: 0; transform: translateY(10px) scale(.88) rotate(4deg); }
+  to { opacity: 1; transform: translateY(0) scale(1) rotate(0); }
+}
+
+@media (max-width: 640px) {
+  .yr-floating-action {
+    right: 14px;
+    bottom: calc(14px + env(safe-area-inset-bottom));
+  }
+
+  .yr-floating-action .yr-ai-launcher,
+  .yr-whatsapp-launcher {
+    width: 56px !important;
+    height: 56px !important;
+    padding: 0 !important;
+    border-radius: 18px !important;
+    display: grid !important;
+    place-items: center !important;
+  }
+
+  .yr-whatsapp-launcher > span {
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+  }
+
+  .yr-whatsapp-launcher strong,
+  .yr-whatsapp-launcher small {
+    display: none;
+  }
+
+  .yr-whatsapp-launcher::after {
+    content: 'WA';
+    position: absolute;
+    right: -3px;
+    top: -5px;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 4px;
+    border-radius: 999px;
+    display: grid;
+    place-items: center;
+    background: #0b5f47;
+    color: white;
+    border: 2px solid white;
+    font-size: 7px;
+    font-weight: 900;
+    letter-spacing: .03em;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .yr-floating-action { animation: none !important; }
+}
