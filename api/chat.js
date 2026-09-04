@@ -32,13 +32,30 @@ Regras de atendimento:
 `
 
 function sanitizeMessages(messages = []) {
-  return messages
-    .filter((item) => item && ['user', 'model'].includes(item.role) && typeof item.text === 'string')
+  const cleaned = messages
+    .filter((item) => item && ['user', 'model'].includes(item.role) && typeof item.text === 'string' && item.text.trim())
     .slice(-12)
-    .map((item) => ({
-      role: item.role,
-      parts: [{ text: item.text.slice(0, 2500) }],
-    }))
+    .map((item) => ({ role: item.role, text: item.text.trim().slice(0, 2500) }))
+
+  // A mensagem inicial do Assistente YR existe apenas na interface. Gemini 3
+  // não deve receber uma conversa começando com um turno predefinido do modelo.
+  while (cleaned[0]?.role === 'model') cleaned.shift()
+
+  // Junta turnos consecutivos do mesmo papel para manter um histórico válido.
+  const normalized = []
+  for (const item of cleaned) {
+    const previous = normalized[normalized.length - 1]
+    if (previous?.role === item.role) {
+      previous.text = `${previous.text}\n${item.text}`.slice(0, 4000)
+    } else {
+      normalized.push({ ...item })
+    }
+  }
+
+  return normalized.map((item) => ({
+    role: item.role,
+    parts: [{ text: item.text }],
+  }))
 }
 
 function extractText(data) {
@@ -62,7 +79,6 @@ async function callModel(model, apiKey, contents) {
         contents,
         generationConfig: {
           maxOutputTokens: 650,
-          temperature: 0.45,
           thinkingConfig: { thinkingLevel: 'low' },
         },
       }),
@@ -84,6 +100,7 @@ export default async function handler(req, res) {
 
   const apiKey = process.env.GEMINI_API_KEY
   if (!apiKey) {
+    console.error('GEMINI_API_KEY missing at runtime')
     return res.status(503).json({ error: 'Assistente ainda não configurado.' })
   }
 
@@ -100,18 +117,24 @@ export default async function handler(req, res) {
 
       if (response.ok) {
         const reply = extractText(data)
-        if (reply) return res.status(200).json({ reply, model })
+        if (reply) {
+          console.log(`Assistente YR respondeu com ${model}`)
+          return res.status(200).json({ reply, model })
+        }
         failures.push(`${model}: resposta vazia`)
         continue
       }
 
+      const detail = data?.error?.message || data?.message || `HTTP ${response.status}`
+      console.warn(`Gemini ${model} falhou: ${response.status} ${String(detail).slice(0, 240)}`)
+
       if (response.status === 401 || response.status === 403) {
-        console.error('Gemini authentication error', response.status)
         return res.status(502).json({ error: 'Falha de autenticação do assistente.' })
       }
 
       failures.push(`${model}: ${response.status}`)
     } catch (error) {
+      console.warn(`Gemini ${model} exception: ${error?.name || 'erro'} ${error?.message || ''}`)
       failures.push(`${model}: ${error?.name || 'erro'}`)
     }
   }
