@@ -5,11 +5,13 @@
     position: relative !important;
     min-height: 0 !important;
     height: auto !important;
-    padding: 24px 0 34px !important;
+    padding: 18px 0 34px !important;
+    margin: 0 !important;
     overflow: hidden !important;
+    background: linear-gradient(180deg, #f7fbfb 0%, #ffffff 100%) !important;
   }
 
-  /* O tamanho do hero passa a ser determinado SOMENTE pelo texto. */
+  /* No mobile, o hero começa pelo conteúdo. Nenhuma arte ocupa espaço acima do título. */
   .hero-grid {
     position: relative !important;
     z-index: 2 !important;
@@ -35,23 +37,14 @@
     transform: none !important;
   }
 
-  /* A arte do hero não participa mais do fluxo no mobile.
-     Assim ela nunca consegue empurrar o título para baixo. */
-  .hero-visual {
-    position: absolute !important;
-    inset: 0 !important;
-    z-index: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    min-height: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    pointer-events: none !important;
-    overflow: hidden !important;
-  }
-
+  /* Remove completamente a área visual do topo no mobile.
+     Ela estava criando a sensação de um grande espaço branco antes do título. */
+  .hero-visual,
   .hero-visual__frame,
-  .hero-floating {
+  .hero-floating,
+  .hero::before,
+  .hero::after,
+  .hero-glow {
     display: none !important;
   }
 
@@ -74,38 +67,11 @@
   .hero-proof {
     margin-top: 22px !important;
   }
-
-  /* Mantém apenas uma marca YR discreta atrás do conteúdo. */
-  .hero::before {
-    top: 28px !important;
-    right: -54px !important;
-    width: 180px !important;
-    opacity: .12 !important;
-  }
-
-  .hero::after {
-    top: 96px !important;
-    right: 4px !important;
-    width: 92px !important;
-    opacity: .25 !important;
-  }
-
-  .hero-glow--one {
-    width: 190px !important;
-    height: 190px !important;
-    right: -92px !important;
-    top: -52px !important;
-    opacity: .42 !important;
-  }
-
-  .hero-glow--two {
-    display: none !important;
-  }
 }
 
 @media (max-width: 640px) {
   .hero {
-    padding: 20px 0 30px !important;
+    padding: 16px 0 30px !important;
   }
 
   .hero-copy h1 {
