@@ -23,6 +23,15 @@ function SparkIcon() {
   )
 }
 
+function WhatsAppIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.85" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M20.5 11.6a8.5 8.5 0 0 1-12.6 7.5L3 20.5l1.4-4.7A8.5 8.5 0 1 1 20.5 11.6Z" />
+      <path d="M8.4 7.9c.2-.4.4-.4.7-.4h.4c.2 0 .4.1.5.4l.8 1.9c.1.3 0 .5-.2.7l-.6.7c-.2.2-.2.4-.1.6.4.8 1 1.5 1.7 2.1.7.6 1.5 1 2.3 1.3.3.1.5 0 .7-.2l.7-.9c.2-.3.5-.3.8-.2l1.8.9c.3.1.4.3.4.5 0 .3-.2 1.4-.8 1.9-.5.5-1.3.8-2.2.7-1.1-.1-2.6-.5-4.4-1.6-1.6-1-2.8-2.3-3.6-3.5-.8-1.2-1.3-2.5-1.2-3.5 0-.6.3-1.1.6-1.4Z" />
+    </svg>
+  )
+}
+
 function SendIcon() {
   return (
     <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -38,7 +47,23 @@ export default function AssistantYR() {
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [lastModel, setLastModel] = useState('')
+  const [showWhatsApp, setShowWhatsApp] = useState(false)
   const scrollRef = useRef(null)
+
+  useEffect(() => {
+    const updateFloatingAction = () => {
+      const threshold = Math.max(260, window.innerHeight * 0.38)
+      setShowWhatsApp(window.scrollY > threshold)
+    }
+
+    updateFloatingAction()
+    window.addEventListener('scroll', updateFloatingAction, { passive: true })
+    window.addEventListener('resize', updateFloatingAction)
+    return () => {
+      window.removeEventListener('scroll', updateFloatingAction)
+      window.removeEventListener('resize', updateFloatingAction)
+    }
+  }, [])
 
   useEffect(() => {
     if (!open) return
@@ -47,10 +72,17 @@ export default function AssistantYR() {
     })
   }, [messages, loading, open])
 
+  const whatsappUrl = (text) => `https://wa.me/${siteConfig.whatsapp}?text=${encodeURIComponent(text)}`
+
+  const openWhatsAppLead = () => {
+    const text = 'Olá! Vim pelo site do Grupo YR Hospitalar e gostaria de receber orientação sobre compra ou locação de equipamentos hospitalares.'
+    window.open(whatsappUrl(text), '_blank', 'noopener,noreferrer')
+  }
+
   const humanContact = () => {
     const text = 'Olá! Vim pelo Assistente YR e gostaria de falar com uma pessoa sobre equipamentos hospitalares.'
     if (siteConfig.whatsapp?.trim()) {
-      window.open(`https://wa.me/${siteConfig.whatsapp}?text=${encodeURIComponent(text)}`, '_blank', 'noopener,noreferrer')
+      window.open(whatsappUrl(text), '_blank', 'noopener,noreferrer')
       return
     }
     window.location.href = `mailto:${siteConfig.email}?subject=${encodeURIComponent('Atendimento humano - Grupo YR Hospitalar')}&body=${encodeURIComponent(text)}`
@@ -95,11 +127,21 @@ export default function AssistantYR() {
 
   return (
     <>
-      <button className="yr-ai-launcher" type="button" onClick={() => setOpen(true)} aria-label="Abrir Assistente YR">
-        <span><SparkIcon /></span>
-        <strong>Assistente YR</strong>
-        <small>IA</small>
-      </button>
+      <div className={`yr-floating-action ${showWhatsApp ? 'yr-floating-action--whatsapp' : 'yr-floating-action--ai'}`}>
+        {showWhatsApp ? (
+          <button className="yr-whatsapp-launcher" type="button" onClick={openWhatsAppLead} aria-label="Falar com a YR no WhatsApp">
+            <span><WhatsAppIcon /></span>
+            <strong>WhatsApp</strong>
+            <small>ONLINE</small>
+          </button>
+        ) : (
+          <button className="yr-ai-launcher" type="button" onClick={() => setOpen(true)} aria-label="Abrir Assistente YR">
+            <span><SparkIcon /></span>
+            <strong>Assistente YR</strong>
+            <small>IA</small>
+          </button>
+        )}
+      </div>
 
       {open ? (
         <div className="yr-ai-shell" role="dialog" aria-modal="true" aria-label="Assistente YR">
