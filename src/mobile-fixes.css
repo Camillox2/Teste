@@ -1,9 +1,18 @@
 /* Mobile polish + hero image reliability */
+.hero-visual__frame {
+  background-color: #f4f8f9;
+  background-image:
+    linear-gradient(145deg, rgba(238, 244, 246, .48), rgba(251, 252, 253, .72)),
+    url('https://vitalscheffer.com.br/revenda_curitiba/assets/cama-manual-3mov.png');
+  background-position: center, center;
+  background-repeat: no-repeat, no-repeat;
+  background-size: cover, min(92%, 760px) auto;
+}
+
+/* The original local hero file was rendering corrupted on some mobile browsers.
+   Keep it in the project as a fallback asset, but use the stable product image above. */
 .hero-visual__frame img {
-  opacity: 1 !important;
-  visibility: visible !important;
-  object-fit: contain;
-  object-position: center;
+  display: none !important;
 }
 
 @media (max-width: 640px) {
@@ -26,24 +35,17 @@
     grid-column: 1 / -1;
     min-height: 0;
     height: auto;
-    aspect-ratio: 1.12 / 1;
+    aspect-ratio: 1.15 / 1;
     padding: 12px;
     border-radius: 26px;
-    background: linear-gradient(145deg, #eef4f6 0%, #fbfcfd 100%);
+    background-size: cover, 96% auto;
+    background-position: center, center 58%;
   }
 
   .hero-visual__frame::after {
     inset: auto 18px 16px;
-    height: 62px;
-  }
-
-  .hero-visual__frame img {
-    width: 100%;
-    height: 100% !important;
-    max-height: none;
-    object-fit: contain;
-    animation: none;
-    transform: none;
+    height: 54px;
+    opacity: .65;
   }
 
   .hero-visual__label {
