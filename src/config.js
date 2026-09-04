@@ -1,6 +1,6 @@
 export const siteConfig = {
   company: 'Grupo YR Hospitalar',
   email: 'rodrigo@grupoyrhospitalar.com.br',
-  // Informe apenas números, com DDI + DDD. Exemplo: 5541999999999
-  whatsapp: '',
+  // Somente números, com DDI + DDD.
+  whatsapp: '554197244279',
 }
