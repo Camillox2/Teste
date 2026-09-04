@@ -1,0 +1,71 @@
+/* Hotfix mobile do hero: remove o vazio acima do título sem alterar os botões flutuantes. */
+@media (max-width: 860px) {
+  .hero {
+    padding-top: 24px !important;
+  }
+
+  .hero-grid {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    grid-template-areas:
+      "copy"
+      "visual" !important;
+    gap: 26px !important;
+    align-items: start !important;
+  }
+
+  .hero-copy {
+    grid-area: copy !important;
+    order: initial !important;
+    position: relative !important;
+    z-index: 5 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    min-height: 0 !important;
+    align-self: start !important;
+  }
+
+  .hero-visual {
+    grid-area: visual !important;
+    order: initial !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero {
+    padding: 22px 0 30px !important;
+  }
+
+  .hero-grid {
+    gap: 24px !important;
+  }
+
+  .hero-copy .kicker {
+    margin: 0 0 12px !important;
+  }
+
+  .hero-copy h1 {
+    margin: 0 !important;
+  }
+
+  .hero-copy > p {
+    margin-top: 16px !important;
+  }
+
+  /* Mantém a marca apenas como fundo decorativo atrás do texto. */
+  .hero::before {
+    top: 34px !important;
+    right: -58px !important;
+    width: 165px !important;
+    opacity: .13 !important;
+  }
+
+  .hero::after {
+    top: 112px !important;
+    right: -10px !important;
+    width: 88px !important;
+    opacity: .36 !important;
+  }
+}
