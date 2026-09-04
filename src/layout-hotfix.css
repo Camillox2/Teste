@@ -1,45 +1,58 @@
-/* Hotfix mobile do hero: remove o vazio acima do título sem alterar os botões flutuantes. */
+/* Hotfix definitivo do hero mobile. Não altera IA/WhatsApp. */
+
 @media (max-width: 860px) {
   .hero {
-    padding-top: 24px !important;
-  }
-
-  .hero-grid {
-    display: grid !important;
-    grid-template-columns: 1fr !important;
-    grid-template-areas:
-      "copy"
-      "visual" !important;
-    gap: 26px !important;
-    align-items: start !important;
-  }
-
-  .hero-copy {
-    grid-area: copy !important;
-    order: initial !important;
     position: relative !important;
+    min-height: 0 !important;
+    height: auto !important;
+    padding: 24px 0 34px !important;
+    overflow: hidden !important;
+  }
+
+  /* O tamanho do hero passa a ser determinado SOMENTE pelo texto. */
+  .hero-grid {
+    position: relative !important;
+    z-index: 2 !important;
+    display: block !important;
+    min-height: 0 !important;
+    height: auto !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+  }
+
+  .hero-copy,
+  .hero-copy[data-reveal] {
+    position: relative !important;
+    inset: auto !important;
     z-index: 5 !important;
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
     margin: 0 !important;
     padding: 0 !important;
-    min-height: 0 !important;
-    align-self: start !important;
+    opacity: 1 !important;
+    transform: none !important;
   }
 
+  /* A arte do hero não participa mais do fluxo no mobile.
+     Assim ela nunca consegue empurrar o título para baixo. */
   .hero-visual {
-    grid-area: visual !important;
-    order: initial !important;
+    position: absolute !important;
+    inset: 0 !important;
+    z-index: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
     min-height: 0 !important;
     margin: 0 !important;
-  }
-}
-
-@media (max-width: 640px) {
-  .hero {
-    padding: 22px 0 30px !important;
+    padding: 0 !important;
+    pointer-events: none !important;
+    overflow: hidden !important;
   }
 
-  .hero-grid {
-    gap: 24px !important;
+  .hero-visual__frame,
+  .hero-floating {
+    display: none !important;
   }
 
   .hero-copy .kicker {
@@ -51,21 +64,59 @@
   }
 
   .hero-copy > p {
-    margin-top: 16px !important;
+    margin-top: 18px !important;
   }
 
-  /* Mantém a marca apenas como fundo decorativo atrás do texto. */
+  .hero-actions {
+    margin-top: 24px !important;
+  }
+
+  .hero-proof {
+    margin-top: 22px !important;
+  }
+
+  /* Mantém apenas uma marca YR discreta atrás do conteúdo. */
   .hero::before {
-    top: 34px !important;
-    right: -58px !important;
-    width: 165px !important;
-    opacity: .13 !important;
+    top: 28px !important;
+    right: -54px !important;
+    width: 180px !important;
+    opacity: .12 !important;
   }
 
   .hero::after {
-    top: 112px !important;
-    right: -10px !important;
-    width: 88px !important;
-    opacity: .36 !important;
+    top: 96px !important;
+    right: 4px !important;
+    width: 92px !important;
+    opacity: .25 !important;
+  }
+
+  .hero-glow--one {
+    width: 190px !important;
+    height: 190px !important;
+    right: -92px !important;
+    top: -52px !important;
+    opacity: .42 !important;
+  }
+
+  .hero-glow--two {
+    display: none !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero {
+    padding: 20px 0 30px !important;
+  }
+
+  .hero-copy h1 {
+    max-width: 96% !important;
+    font-size: clamp(40px, 11.5vw, 53px) !important;
+    line-height: .98 !important;
+  }
+
+  .hero-copy > p {
+    max-width: 96% !important;
+    font-size: 16px !important;
+    line-height: 1.62 !important;
   }
 }
