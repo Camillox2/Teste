@@ -15,7 +15,9 @@
   color: white;
   background: linear-gradient(135deg, #061528 0%, #0d2b4c 100%);
   box-shadow: 0 18px 44px rgba(6, 21, 40, .28);
+  transition: transform .2s ease, box-shadow .2s ease;
 }
+.yr-ai-launcher:hover { transform: translateY(-2px); box-shadow: 0 22px 50px rgba(6,21,40,.32); }
 
 .yr-ai-launcher > span {
   width: 38px;
@@ -227,15 +229,45 @@
 
 @media (max-width: 640px) {
   .yr-ai-launcher {
-    right: 12px;
-    bottom: calc(12px + env(safe-area-inset-bottom));
-    padding: 8px 12px 8px 8px;
+    right: 14px;
+    bottom: calc(14px + env(safe-area-inset-bottom));
+    width: 56px;
+    height: 56px;
+    padding: 0;
+    border-radius: 18px;
+    display: grid;
+    place-items: center;
   }
-  .yr-ai-launcher > span { width: 36px; height: 36px; }
+  .yr-ai-launcher > span {
+    width: 40px;
+    height: 40px;
+    border-radius: 14px;
+  }
+  .yr-ai-launcher strong,
+  .yr-ai-launcher small { display: none; }
+  .yr-ai-launcher::after {
+    content: 'IA';
+    position: absolute;
+    right: -3px;
+    top: -5px;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 4px;
+    border-radius: 999px;
+    display: grid;
+    place-items: center;
+    background: #0f766e;
+    color: white;
+    border: 2px solid white;
+    font-size: 7px;
+    font-weight: 900;
+    letter-spacing: .04em;
+  }
+
   .yr-ai-shell {
-    inset: auto 8px calc(66px + env(safe-area-inset-bottom)) 8px;
+    inset: auto 8px calc(80px + env(safe-area-inset-bottom)) 8px;
     width: auto;
-    height: min(650px, calc(100dvh - 84px));
+    height: min(650px, calc(100dvh - 96px));
     border-radius: 24px;
   }
 }
