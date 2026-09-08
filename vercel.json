@@ -2,5 +2,20 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "vite",
   "buildCommand": "npm run build",
-  "outputDirectory": "dist"
+  "outputDirectory": "dist",
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "redirects": [{
+    "source": "/:path*",
+    "has": [{ "type": "host", "value": "grupo-yr-hospitalar.vercel.app" }],
+    "destination": "https://site.grupoyrhospitalar.com.br/:path*",
+    "permanent": true
+  }],
+  "headers": [{
+    "source": "/(.*)",
+    "headers": [
+      { "key": "X-Content-Type-Options", "value": "nosniff" },
+      { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
+    ]
+  }]
 }

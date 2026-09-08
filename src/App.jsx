@@ -1,101 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { siteConfig } from './config.js'
+import { products, faqs, productPath } from './catalog.js'
+import DecisionGuide from './DecisionGuide.jsx'
 
 const heroBed = '/products/cama-hospitalar.webp'
 const logoImage = '/yr-hospitalar-logo.jpg'
-
-const products = [
-  {
-    id: 1,
-    name: 'Cama hospitalar articulada',
-    category: 'Camas',
-    description: 'Conforto, segurança e múltiplas posições para recuperação, home care e cuidados diários.',
-    image: heroBed,
-    sale: true,
-    rent: true,
-    featured: true,
-    idealFor: 'Recuperação pós-operatória, idosos, pessoas com mobilidade reduzida e cuidados prolongados.',
-    benefits: ['Mais conforto no posicionamento', 'Facilita a rotina do cuidador', 'Opção de compra ou locação'],
-  },
-  {
-    id: 2,
-    name: 'Carrinho de emergência',
-    category: 'Emergência',
-    description: 'Organização prática de medicamentos, insumos e equipamentos essenciais para atendimento profissional.',
-    image: '/products/carrinho-emergencia.webp',
-    sale: true,
-    rent: false,
-    idealFor: 'Clínicas, consultórios, unidades de atendimento e ambientes hospitalares.',
-    benefits: ['Organização rápida', 'Acesso facilitado a insumos', 'Uso profissional'],
-  },
-  {
-    id: 3,
-    name: 'Maca hidráulica',
-    category: 'Macas',
-    description: 'Mobilidade, estabilidade e ajuste de altura para rotinas clínicas, hospitalares e transporte interno.',
-    image: '/products/maca-hidraulica.webp',
-    sale: true,
-    rent: true,
-    idealFor: 'Clínicas, hospitais e atendimentos que exigem mobilidade e regulagem de altura.',
-    benefits: ['Ajuste de altura', 'Mais ergonomia no atendimento', 'Mobilidade facilitada'],
-  },
-  {
-    id: 4,
-    name: 'Biombo hospitalar',
-    category: 'Mobiliário',
-    description: 'Privacidade e praticidade para consultórios, clínicas, hospitais e ambientes de home care.',
-    image: '/products/biombo.webp',
-    sale: true,
-    rent: false,
-    idealFor: 'Ambientes que precisam criar privacidade de forma rápida e flexível.',
-    benefits: ['Privacidade no atendimento', 'Fácil movimentação', 'Aplicação versátil'],
-  },
-  {
-    id: 5,
-    name: 'Mesa de refeição hospitalar',
-    category: 'Acessórios',
-    description: 'Apoio regulável para refeições, leitura e atividades durante a recuperação do paciente.',
-    image: '/products/mesa-refeicao.webp',
-    sale: true,
-    rent: true,
-    idealFor: 'Pacientes acamados ou com mobilidade reduzida em casa, clínicas e instituições.',
-    benefits: ['Mais autonomia', 'Altura regulável', 'Uso diário simples'],
-  },
-  {
-    id: 6,
-    name: 'Cama manual 3 movimentos',
-    category: 'Camas',
-    description: 'Versatilidade para posicionamento do paciente com estrutura resistente e operação simples.',
-    image: '/products/cama-manual-3mov.webp',
-    sale: true,
-    rent: true,
-    idealFor: 'Uso domiciliar ou institucional que precisa de ajustes essenciais com bom custo-benefício.',
-    benefits: ['Movimentos essenciais', 'Estrutura funcional', 'Compra ou locação'],
-  },
-]
-
-const faqs = [
-  {
-    q: 'É melhor comprar ou alugar um equipamento hospitalar?',
-    a: 'Depende principalmente do tempo de uso, da frequência e do orçamento. A locação costuma fazer mais sentido para necessidades temporárias. A compra tende a ser mais interessante quando o uso será prolongado ou recorrente. A equipe da YR pode ajudar a comparar as duas opções antes de você decidir.',
-  },
-  {
-    q: 'A YR atende pessoas físicas e empresas?',
-    a: 'Sim. O atendimento foi pensado tanto para famílias e cuidadores quanto para clínicas, consultórios e outras operações profissionais de saúde.',
-  },
-  {
-    q: 'Posso pedir orientação antes de escolher o produto?',
-    a: 'Sim. Você pode explicar o cenário, o período de uso e a necessidade principal. A proposta da YR é tornar a escolha mais simples, sem exigir que o cliente já saiba exatamente qual modelo precisa.',
-  },
-  {
-    q: 'Como funciona a entrega?',
-    a: 'Prazo, região atendida e condições de entrega são confirmados na cotação, conforme o produto e a disponibilidade. Assim, tudo fica alinhado antes da contratação.',
-  },
-  {
-    q: 'Os valores aparecem no site?',
-    a: 'Os valores são informados por cotação. Isso permite considerar disponibilidade, modalidade de compra ou locação, período de uso e condições de entrega antes de fechar.',
-  },
-]
 
 const trustItems = [
   {
@@ -154,9 +63,9 @@ function Icon({ name, size = 20 }) {
   return <svg {...props}>{paths[name]}</svg>
 }
 
-function BrandLogo({ compact = false }) {
+export function BrandLogo({ compact = false }) {
   return (
-    <a className={`brand-logo ${compact ? 'brand-logo--compact' : ''}`} href="#inicio" aria-label="Grupo YR Hospitalar - início">
+    <a className={`brand-logo ${compact ? 'brand-logo--compact' : ''}`} href="/#inicio" aria-label="Grupo YR Hospitalar - início">
       <span className="brand-logo__mark">
         <img src={logoImage} alt="YR" />
       </span>
@@ -187,6 +96,17 @@ function App() {
   })
 
   const hasWhatsApp = Boolean(siteConfig.whatsapp?.trim())
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const product = products.find(item => item.slug === params.get('produto'))
+    const requested = params.get('interesse')
+    if (!product) return
+    const interest = requested === 'alugar' && product.rent ? 'Alugar' : requested === 'comprar' ? 'Comprar' : 'Cotação'
+    setFormData(current => ({...current, product: product.name, interest}))
+    setContactOpen(true)
+    window.history.replaceState(null, '', '/#contato')
+  }, [])
 
   const visibleProducts = useMemo(() => {
     const normalize = (text) => text.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
@@ -227,23 +147,16 @@ function App() {
   }, [selectedProduct, contactOpen, legalOpen])
 
   useEffect(() => {
-    const elements = document.querySelectorAll('[data-reveal]')
-    if (!('IntersectionObserver' in window)) {
-      elements.forEach((element) => element.classList.add('is-visible'))
-      return undefined
-    }
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('is-visible')
-          observer.unobserve(entry.target)
-        }
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) return
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return
+        entry.target.animate([{opacity:.35, transform:'translateY(24px)'},{opacity:1, transform:'translateY(0)'}], {duration:650,easing:'cubic-bezier(.16,1,.3,1)'})
+        observer.unobserve(entry.target)
       })
-    }, { threshold: 0.12 })
-
-    elements.forEach((element) => observer.observe(element))
-    return () => observer.disconnect()
+    }, {threshold:.12})
+    document.querySelectorAll('[data-reveal], .decision-studio__intro, .decision-studio__panel').forEach(el=>observer.observe(el))
+    return ()=>observer.disconnect()
   }, [mode, query])
 
   const createContactUrl = ({ product, action = 'orçamento', details = '' } = {}) => {
@@ -302,12 +215,12 @@ function App() {
         <div className="container header-inner">
           <BrandLogo />
           <nav id="menu-principal" className={menuOpen ? 'nav nav--open' : 'nav'} aria-label="Navegação principal">
-            <a href="#produtos" onClick={() => setMenuOpen(false)}>Produtos</a>
-            <a href="#comprar-alugar" onClick={() => setMenuOpen(false)}>Comprar ou alugar</a>
-            <a href="#porque-yr" onClick={() => setMenuOpen(false)}>Por que YR</a>
+            <a href="#produtos" onClick={() => setMenuOpen(false)}>Equipamentos</a>
+            <a href="#comprar-alugar" onClick={() => setMenuOpen(false)}>Sua escolha</a>
+            <a href="#porque-yr" onClick={() => setMenuOpen(false)}>A YR</a>
             <a href="#faq" onClick={() => setMenuOpen(false)}>Dúvidas</a>
           </nav>
-          <button className="header-cta" onClick={() => openContactFor('Orientação')}>Falar com a YR <Icon name="arrow" size={17} /></button>
+          <button className="header-cta" onClick={() => openContactFor('Orientação')}>Conversar com a YR <Icon name="arrow" size={17} /></button>
           <button className="menu-button" aria-expanded={menuOpen} aria-controls="menu-principal" onClick={() => setMenuOpen((value) => !value)} aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'}>
             <Icon name={menuOpen ? 'close' : 'menu'} size={24} />
           </button>
@@ -315,111 +228,28 @@ function App() {
       </header>
 
       <main id="conteudo">
-        <section className="hero" id="inicio">
-          <div className="hero-glow hero-glow--one" />
-          <div className="hero-glow hero-glow--two" />
-          <div className="container hero-grid">
-            <div className="hero-copy" data-reveal>
-              <span className="kicker">Venda e locação de equipamentos hospitalares</span>
-              <h1>Equipamentos certos. <em>Cuidado mais simples.</em></h1>
-              <p>
-                Compre ou alugue equipamentos para o cuidado em casa e a rotina de clínicas e hospitais.
-                Conte com a YR para comparar opções e solicitar sua cotação.
-              </p>
-              <div className="hero-actions">
-                <button className="btn btn--primary" onClick={() => openContactFor('Cotação')}>Solicitar cotação <Icon name="arrow" size={18} /></button>
-                <a className="btn btn--secondary" href="#produtos">Explorar produtos <Icon name="arrow" size={18} /></a>
-              </div>
-              <div className="hero-proof">
-                <span><Icon name="check" size={17} /> Compra ou locação</span>
-                <span><Icon name="check" size={17} /> Atendimento direto</span>
-                <span><Icon name="check" size={17} /> Cotação personalizada</span>
-              </div>
-            </div>
-
-            <div className="hero-visual" data-reveal>
-              <div className="hero-visual__frame">
-                <div className="hero-visual__label">Cuidado hospitalar e home care</div>
-                <img src={heroBed} alt="Cama hospitalar articulada em ambiente de cuidado" width="800" height="623" fetchPriority="high" />
-              </div>
-              <div className="hero-floating hero-floating--top">
-                <span><Icon name="heart" size={19} /></span>
-                <div><small>Mais que catálogo</small><strong>Orientação humana</strong></div>
-              </div>
-              <div className="hero-floating hero-floating--bottom">
-                <span><Icon name="compare" size={19} /></span>
-                <div><small>Compare antes de decidir</small><strong>Comprar × Alugar</strong></div>
-              </div>
-            </div>
+        <section className="cinematic-hero" id="inicio" aria-labelledby="hero-title">
+          <div className="container hero-title-wrap"><h1 id="hero-title"><span>O cuidado muda tudo.</span><em>O equipamento também.</em></h1></div>
+          <div className="hero-stage">
+            <div className="hero-stage__photo"><img src={heroBed} alt="Cama hospitalar articulada para cuidado domiciliar ou institucional" width="1000" height="779" fetchPriority="high" /><a className="photo-explore" href="#produtos"><span aria-hidden="true">↗</span>Explore o catálogo</a></div>
+            <div className="hero-stage__note"><h2>Equipamentos hospitalares para compra e locação.</h2><p>Para o cuidado em casa e a rotina de clínicas e hospitais.</p><a className="btn btn--light" href="#comprar-alugar">Encontrar meu equipamento <Icon name="arrow" size={19} /></a></div>
           </div>
+          <nav className="container chapter-rail" aria-label="Explore a página"><a href="#comprar-alugar"><span>01</span><i aria-hidden="true" />Entenda seu momento <Icon name="arrow" size={17}/></a><a href="#produtos"><span>02</span><i aria-hidden="true" />Explore equipamentos <Icon name="arrow" size={17}/></a><a href="#contato"><span>03</span><i aria-hidden="true" />Converse com a YR <Icon name="arrow" size={17}/></a></nav>
         </section>
 
-        <section className="quick-trust" aria-label="Diferenciais rápidos">
-          <div className="container quick-trust__grid">
-            <article data-reveal><Icon name="chat" size={26} /><div><strong>Atendimento próximo</strong><span>Converse antes de decidir</span></div></article>
-            <article data-reveal><Icon name="compare" size={26} /><div><strong>Venda e locação</strong><span>Escolha pelo seu cenário</span></div></article>
-            <article data-reveal><Icon name="truck" size={26} /><div><strong>Entrega alinhada</strong><span>Condições confirmadas na cotação</span></div></article>
-          </div>
-        </section>
-
-        <section className="decision-section" id="comprar-alugar">
-          <div className="container">
-            <div className="section-heading section-heading--center" data-reveal>
-              <span className="eyeline">Comprar ou alugar?</span>
-              <h2>A melhor escolha depende do seu momento.</h2>
-              <p>A YR coloca as duas alternativas lado a lado para você decidir com mais clareza.</p>
-            </div>
-
-            <div className="decision-grid">
-              <article className="decision-card decision-card--rent" data-reveal>
-                <div className="decision-card__top">
-                  <span className="decision-icon"><Icon name="clock" size={26} /></span>
-                  <span className="decision-label">Locação</span>
-                </div>
-                <h3>Boa escolha para necessidades temporárias.</h3>
-                <ul>
-                  <li><Icon name="check" size={17} /> Recuperação pós-operatória</li>
-                  <li><Icon name="check" size={17} /> Home care por período determinado</li>
-                  <li><Icon name="check" size={17} /> Necessidade imediata sem compra definitiva</li>
-                  <li><Icon name="check" size={17} /> Quando você ainda não sabe por quanto tempo vai usar</li>
-                </ul>
-                <button onClick={() => openContactFor('Alugar')}>Quero avaliar locação <Icon name="arrow" size={17} /></button>
-              </article>
-
-              <article className="decision-card decision-card--buy" data-reveal>
-                <div className="decision-card__top">
-                  <span className="decision-icon"><Icon name="home" size={26} /></span>
-                  <span className="decision-label">Compra</span>
-                </div>
-                <h3>Faz sentido quando o uso será recorrente ou prolongado.</h3>
-                <ul>
-                  <li><Icon name="check" size={17} /> Necessidade permanente ou de longo prazo</li>
-                  <li><Icon name="check" size={17} /> Clínicas, instituições e operações profissionais</li>
-                  <li><Icon name="check" size={17} /> Equipamento que precisa estar sempre disponível</li>
-                  <li><Icon name="check" size={17} /> Investimento em estrutura própria</li>
-                </ul>
-                <button onClick={() => openContactFor('Comprar')}>Quero avaliar compra <Icon name="arrow" size={17} /></button>
-              </article>
-            </div>
-
-            <div className="decision-help" data-reveal>
-              <div>
-                <span className="decision-help__icon"><Icon name="info" size={22} /></span>
-                <div><strong>Ainda não sabe qual escolher?</strong><p>Explique o cenário e a YR ajuda você a comparar sem compromisso.</p></div>
-              </div>
-              <button className="btn btn--dark" onClick={() => openContactFor('Orientação')}>Quero orientação</button>
-            </div>
-          </div>
-        </section>
+        <DecisionGuide onContinue={(context) => {
+          setFormData(current => ({...current, interest: context.interest, period: context.period, message: context.message}))
+          setContactOpen(true)
+        }} />
 
         <section className="products-section" id="produtos">
           <div className="container">
             <div className="products-head" data-reveal>
               <div className="section-heading">
-                <span className="eyeline">Encontre seu equipamento</span>
-                <h2>Soluções para cuidado, mobilidade e rotina hospitalar.</h2>
-                <p>Veja os principais itens e peça uma cotação personalizada para o seu cenário.</p>
+                <span className="section-index">02 / EQUIPAMENTOS</span>
+                <h2>Encontre o que <em>faz sentido.</em></h2>
               </div>
+              <div className="catalog-overview"><p>Para cada rotina, uma escolha. Conheça os equipamentos e compare as possibilidades.</p>
               <div className="filter-tabs" role="group" aria-label="Filtrar produtos">
                 {[
                   ['todos', 'Todos'],
@@ -431,6 +261,7 @@ function App() {
               </div>
             </div>
 
+            </div>
             <div className="catalog-tools">
               <label className="catalog-search"><span>Buscar equipamento</span><input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Busque por cama, maca, biombo…" /></label>
               <p aria-live="polite">{visibleProducts.length} {visibleProducts.length === 1 ? 'equipamento encontrado' : 'equipamentos encontrados'}</p>
@@ -439,27 +270,27 @@ function App() {
             <div className="product-grid">
               {visibleProducts.map((product) => (
                 <article className={`product-card ${product.featured ? 'product-card--featured' : ''}`} key={product.id} data-reveal>
-                  <button className="product-media" onClick={() => setSelectedProduct(product)} aria-label={`Ver detalhes de ${product.name}`}>
+                  <a className="product-media" href={productPath(product)} aria-label={`Conhecer ${product.name}`}>
                     <img
                       src={product.image}
                       alt={product.name}
-                      loading={product.featured ? 'eager' : 'lazy'}
+                      loading="lazy" width="1000" height="1000" decoding="async"
                       onError={(event) => {
                         event.currentTarget.style.display = 'none'
                         event.currentTarget.parentElement.classList.add('product-media--fallback')
                       }}
                     />
-                    <span className="image-fallback">Imagem em atualização</span>
-                  </button>
+                    <span className="image-fallback">Imagem em atualização</span><span className="product-number" aria-hidden="true">{String(product.id).padStart(2, '0')}</span>
+                  </a>
                   <div className="product-card__body">
                     <div className="product-meta">
                       <span>{product.category}</span>
                       <span>{product.sale && 'Venda'}{product.sale && product.rent && ' • '}{product.rent && 'Locação'}</span>
                     </div>
-                    <h3>{product.name}</h3>
+                    <h3><a href={productPath(product)}>{product.name}</a></h3>
                     <p>{product.description}</p>
                     <div className="product-actions">
-                      <button className="product-link" onClick={() => setSelectedProduct(product)}>Ver detalhes <Icon name="arrow" size={16} /></button>
+                      <a className="product-link" href={productPath(product)}>Conhecer equipamento <Icon name="arrow" size={16} /></a>
                       <button className="product-quote" onClick={() => openContactFor(mode === 'alugar' ? 'Alugar' : mode === 'comprar' ? 'Comprar' : 'Cotação', product.name)}>Pedir cotação</button>
                     </div>
                   </div>
@@ -473,7 +304,7 @@ function App() {
           <div className="container why-grid">
             <div className="section-heading why-intro" data-reveal>
               <span className="eyeline">Por que confiar na YR?</span>
-              <h2>Um atendimento mais próximo em um momento que pede clareza.</h2>
+              <h2>Pessoas por trás de cada escolha.</h2>
               <p>
                 Equipamento hospitalar não é uma compra qualquer. Em vez de apenas mostrar um catálogo,
                 a proposta da YR é entender a necessidade e facilitar a decisão.
@@ -496,43 +327,11 @@ function App() {
           </div>
         </section>
 
-        <section className="difference-section">
-          <div className="container difference-box" data-reveal>
-            <div className="difference-copy">
-              <span className="eyeline eyeline--light">O diferencial da YR</span>
-              <h2>Não é só vender equipamento. É ajudar a encontrar a solução certa.</h2>
-              <p>
-                A YR nasce com uma operação enxuta, o que permite um contato mais direto e uma jornada simples:
-                entender, comparar, cotar e combinar a entrega.
-              </p>
-            </div>
-            <div className="difference-list">
-              <div><span>01</span><strong>Você explica o cenário</strong><p>Sem precisar chegar sabendo exatamente qual modelo procurar.</p></div>
-              <div><span>02</span><strong>A YR ajuda a comparar</strong><p>Compra, locação e tipo de equipamento são avaliados pelo contexto de uso.</p></div>
-              <div><span>03</span><strong>Você decide com clareza</strong><p>A contratação acontece somente depois de alinhar disponibilidade e condições.</p></div>
-            </div>
-          </div>
-        </section>
-
-        <section className="audience-section">
-          <div className="container">
-            <div className="section-heading section-heading--center" data-reveal>
-              <span className="eyeline">Para quem atendemos</span>
-              <h2>Do cuidado em casa à rotina profissional.</h2>
-            </div>
-            <div className="audience-grid">
-              <article data-reveal><span><Icon name="home" size={28} /></span><h3>Famílias e cuidadores</h3><p>Soluções para recuperação, mobilidade e cuidados diários no ambiente domiciliar.</p></article>
-              <article data-reveal><span><Icon name="heart" size={28} /></span><h3>Home care</h3><p>Equipamentos que ajudam a organizar um cuidado mais confortável e funcional em casa.</p></article>
-              <article data-reveal><span><Icon name="building" size={28} /></span><h3>Clínicas e instituições</h3><p>Itens para complementar estrutura, atendimento e rotina operacional de saúde.</p></article>
-            </div>
-          </div>
-        </section>
-
         <section className="process-section" id="como-funciona">
           <div className="container">
             <div className="section-heading section-heading--center" data-reveal>
               <span className="eyeline">Como funciona</span>
-              <h2>Quatro passos, sem complicação.</h2>
+              <h2>Da primeira dúvida à escolha.</h2>
             </div>
             <div className="process-grid">
               <article data-reveal><span>1</span><h3>Conte a necessidade</h3><p>Explique para quem é, o tipo de uso e por quanto tempo pretende utilizar.</p></article>
@@ -548,9 +347,9 @@ function App() {
             <div className="about-logo"><img src={logoImage} alt="Logo YR" /></div>
             <div className="about-copy">
               <span className="eyeline">Sobre o Grupo YR Hospitalar</span>
-              <h2>Uma operação próxima, criada para facilitar uma decisão importante.</h2>
+              <h2>Soluções que transformam saúde.</h2>
               <p>
-                O Grupo YR Hospitalar começa com uma equipe enxuta e atendimento direto. Isso permite acompanhar cada solicitação de perto,
+                O Grupo YR Hospitalar trabalha com venda e locação de equipamentos hospitalares e atendimento direto. A proposta é acompanhar cada solicitação de perto,
                 entender o contexto e buscar uma solução adequada para quem precisa comprar ou alugar equipamentos hospitalares.
               </p>
               <p className="about-note">A proposta é simples: tecnologia para agilizar o contato e pessoas para cuidar da decisão.</p>
@@ -574,7 +373,7 @@ function App() {
                     <button onClick={() => setOpenFaq(active ? -1 : index)} aria-expanded={active}>
                       <span>{item.q}</span><span>{active ? '−' : '+'}</span>
                     </button>
-                    <div className="faq-answer"><p>{item.a}</p></div>
+                    <div className="faq-answer" hidden={!active}><p>{item.a}</p></div>
                   </article>
                 )
               })}
@@ -606,7 +405,7 @@ function App() {
           <div className="footer-column">
             <strong>Navegação</strong>
             <a href="#produtos">Produtos</a>
-            <a href="#comprar-alugar">Comprar ou alugar</a>
+            <a href="/comprar-ou-alugar">Guia: comprar ou alugar</a>
             <a href="#porque-yr">Por que YR</a>
             <a href="#faq">Dúvidas</a>
           </div>

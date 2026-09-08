@@ -1,18 +1,13 @@
 import React from 'react'
-import { createRoot } from 'react-dom/client'
-import App from './App.jsx'
-import AssistantYR from './AssistantYR.jsx'
+import { createRoot, hydrateRoot } from 'react-dom/client'
+import PageRouter from './PageRouter.jsx'
 import './styles.css'
-import './mobile-fixes.css'
-import './hero-brand.css'
 import './assistant.css'
 import './experience-fixes.css'
-import './layout-hotfix.css'
 import './refinements.css'
+import './editorial.css'
 
-createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <App />
-    <AssistantYR />
-  </React.StrictMode>,
-)
+const root = document.getElementById('root')
+const page = <React.StrictMode><PageRouter path={window.location.pathname} /></React.StrictMode>
+if (root.hasChildNodes()) hydrateRoot(root, page)
+else createRoot(root).render(page)

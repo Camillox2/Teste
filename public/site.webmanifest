@@ -1,0 +1,16 @@
+{
+  "name": "Grupo YR Hospitalar",
+  "short_name": "YR Hospitalar",
+  "lang": "pt-BR",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#ffffff",
+  "theme_color": "#071d35",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}

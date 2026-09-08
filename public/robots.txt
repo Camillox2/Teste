@@ -1,3 +1,4 @@
 User-agent: *
 Allow: /
+Disallow: /api/
 Sitemap: https://site.grupoyrhospitalar.com.br/sitemap.xml
