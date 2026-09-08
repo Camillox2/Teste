@@ -245,6 +245,7 @@ summary { cursor:pointer; font-weight:700; line-height:1.6; }
 .hero-stage__note h2 { color:#fff; font-size:clamp(27px,2.45vw,38px); letter-spacing:-.035em; line-height:1.26; margin:0; }
 .hero-stage__note p { color:#d7e2ed; font-size:16px; line-height:1.65; margin:24px 0 30px; }
 .hero-stage__note .btn { font-size:12px; border-radius:4px; padding:16px 18px; width:100%; justify-content:space-between; }
+@media(min-width:701px) { .hero-stage__note .btn { width:calc(100% - 40px); } }
 .photo-explore { position:absolute; z-index:1; bottom:24px; left:40px; display:flex; align-items:center; gap:12px; font-size:12px; font-weight:700; color:#071d35; background:#ffffffee; padding:8px 18px 8px 8px; border-radius:30px; }
 .photo-explore > span { width:40px; height:40px; border:1px solid #9eb5c9; border-radius:50%; display:grid; place-items:center; font-size:22px; transition:transform .3s,background .3s; }
 .photo-explore:hover > span { transform:rotate(45deg); background:#e3edf6; }
