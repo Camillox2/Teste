@@ -132,7 +132,7 @@ export default function AssistantYR() {
           <button className="yr-whatsapp-launcher" type="button" onClick={openWhatsAppLead} aria-label="Falar com a YR no WhatsApp">
             <span><WhatsAppIcon /></span>
             <strong>WhatsApp</strong>
-            <small>ONLINE</small>
+            <small>ATENDIMENTO</small>
           </button>
         ) : (
           <button className="yr-ai-launcher" type="button" onClick={() => setOpen(true)} aria-label="Abrir Assistente YR">

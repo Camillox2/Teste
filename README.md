@@ -29,4 +29,10 @@ Também é compatível com Netlify, Cloudflare Pages e hospedagem estática apó
 
 ## Imagens
 
-A imagem principal foi fornecida para o projeto. Algumas imagens de catálogo usam arquivos públicos da Vital Scheffer como referência visual inicial. Antes do site definitivo, confirme autorização de uso e substitua por imagens próprias do Grupo YR quando disponíveis.
+A logo oficial enviada pelo responsável está em `public/yr-hospitalar-logo.jpg`. As fotos do catálogo foram obtidas, a pedido do responsável, de `https://vitalscheffer.com.br/revenda_curitiba/assets/` e são servidas localmente em WebP em `public/products/`. São referências visuais; modelos e disponibilidade devem ser confirmados na cotação.
+
+## Domínio de produção
+
+`https://site.grupoyrhospitalar.com.br` aponta para o projeto Vercel `grupo-yr-hospitalar`. A Cloudflare mantém o CNAME `site` para `1c937794c9e3afc3.vercel-dns-017.com` com DNS only. O domínio principal, `www`, `crm`, `api` e os registros de e-mail permanecem independentes.
+
+O repositório GitHub é `Camillox2/Teste`, branch `main`. A função `/api/chat` usa `GEMINI_API_KEY` somente no servidor; configure a variável na Vercel. Não grave credenciais no código.

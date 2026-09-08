@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { siteConfig } from './config.js'
 
-const heroBed = '/hero-bed.webp'
-const logoImage = '/yr-logo.webp'
+const heroBed = '/products/cama-hospitalar.webp'
+const logoImage = '/yr-hospitalar-logo.jpg'
 
 const products = [
   {
@@ -22,7 +22,7 @@ const products = [
     name: 'Carrinho de emergência',
     category: 'Emergência',
     description: 'Organização prática de medicamentos, insumos e equipamentos essenciais para atendimento profissional.',
-    image: 'https://vitalscheffer.com.br/revenda_curitiba/assets/carrinho-emergencia.png',
+    image: '/products/carrinho-emergencia.webp',
     sale: true,
     rent: false,
     idealFor: 'Clínicas, consultórios, unidades de atendimento e ambientes hospitalares.',
@@ -33,7 +33,7 @@ const products = [
     name: 'Maca hidráulica',
     category: 'Macas',
     description: 'Mobilidade, estabilidade e ajuste de altura para rotinas clínicas, hospitalares e transporte interno.',
-    image: 'https://vitalscheffer.com.br/revenda_curitiba/assets/maca-hidraulica.png',
+    image: '/products/maca-hidraulica.webp',
     sale: true,
     rent: true,
     idealFor: 'Clínicas, hospitais e atendimentos que exigem mobilidade e regulagem de altura.',
@@ -44,7 +44,7 @@ const products = [
     name: 'Biombo hospitalar',
     category: 'Mobiliário',
     description: 'Privacidade e praticidade para consultórios, clínicas, hospitais e ambientes de home care.',
-    image: 'https://vitalscheffer.com.br/revenda_curitiba/assets/biombo.png',
+    image: '/products/biombo.webp',
     sale: true,
     rent: false,
     idealFor: 'Ambientes que precisam criar privacidade de forma rápida e flexível.',
@@ -55,7 +55,7 @@ const products = [
     name: 'Mesa de refeição hospitalar',
     category: 'Acessórios',
     description: 'Apoio regulável para refeições, leitura e atividades durante a recuperação do paciente.',
-    image: 'https://vitalscheffer.com.br/revenda_curitiba/assets/mesa-refeicao.png',
+    image: '/products/mesa-refeicao.webp',
     sale: true,
     rent: true,
     idealFor: 'Pacientes acamados ou com mobilidade reduzida em casa, clínicas e instituições.',
@@ -66,7 +66,7 @@ const products = [
     name: 'Cama manual 3 movimentos',
     category: 'Camas',
     description: 'Versatilidade para posicionamento do paciente com estrutura resistente e operação simples.',
-    image: 'https://vitalscheffer.com.br/revenda_curitiba/assets/cama-manual-3mov.png',
+    image: '/products/cama-manual-3mov.webp',
     sale: true,
     rent: true,
     idealFor: 'Uso domiciliar ou institucional que precisa de ajustes essenciais com bom custo-benefício.',
@@ -93,7 +93,7 @@ const faqs = [
   },
   {
     q: 'Os valores aparecem no site?',
-    a: 'Nesta versão, os valores são informados por cotação. Isso permite considerar disponibilidade, modalidade de compra ou locação, período de uso e condições de entrega antes de fechar.',
+    a: 'Os valores são informados por cotação. Isso permite considerar disponibilidade, modalidade de compra ou locação, período de uso e condições de entrega antes de fechar.',
   },
 ]
 
@@ -170,6 +170,7 @@ function BrandLogo({ compact = false }) {
 
 function App() {
   const [mode, setMode] = useState('todos')
+  const [query, setQuery] = useState('')
   const [selectedProduct, setSelectedProduct] = useState(null)
   const [menuOpen, setMenuOpen] = useState(false)
   const [contactOpen, setContactOpen] = useState(false)
@@ -180,16 +181,20 @@ function App() {
     phone: '',
     interest: 'Orientação',
     product: 'Ainda não sei',
+    city: '',
+    period: '',
     message: '',
   })
 
   const hasWhatsApp = Boolean(siteConfig.whatsapp?.trim())
 
   const visibleProducts = useMemo(() => {
-    if (mode === 'comprar') return products.filter((product) => product.sale)
-    if (mode === 'alugar') return products.filter((product) => product.rent)
-    return products
-  }, [mode])
+    const normalize = (text) => text.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
+    return products.filter((product) =>
+      (mode !== 'comprar' || product.sale) && (mode !== 'alugar' || product.rent) &&
+      normalize(product.name + ' ' + product.category).includes(normalize(query.trim()))
+    )
+  }, [mode, query])
 
   useEffect(() => {
     const modalOpen = Boolean(selectedProduct || contactOpen || legalOpen)
@@ -197,7 +202,16 @@ function App() {
 
     const previous = document.body.style.overflow
     document.body.style.overflow = 'hidden'
+    const previousFocus = document.activeElement
+    const dialog = document.querySelector('.site-shell [role="dialog"]')
+    dialog?.querySelector('button, input, select, textarea, a[href]')?.focus()
     const closeOnEscape = (event) => {
+      if (event.key === 'Tab' && dialog) {
+        const items = [...dialog.querySelectorAll('button, input, select, textarea, a[href]')].filter((el) => !el.disabled && el.getClientRects().length)
+        const first = items[0], last = items.at(-1)
+        if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus() }
+        if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus() }
+      }
       if (event.key === 'Escape') {
         setSelectedProduct(null)
         setContactOpen(false)
@@ -208,6 +222,7 @@ function App() {
     return () => {
       document.body.style.overflow = previous
       window.removeEventListener('keydown', closeOnEscape)
+      previousFocus?.focus()
     }
   }, [selectedProduct, contactOpen, legalOpen])
 
@@ -229,7 +244,7 @@ function App() {
 
     elements.forEach((element) => observer.observe(element))
     return () => observer.disconnect()
-  }, [])
+  }, [mode, query])
 
   const createContactUrl = ({ product, action = 'orçamento', details = '' } = {}) => {
     const message = [
@@ -248,7 +263,8 @@ function App() {
   }
 
   const handleProductContact = (product, action) => {
-    window.location.href = createContactUrl({ product, action })
+    openContactFor(action === 'locação' ? 'Alugar' : 'Comprar', product.name)
+    setSelectedProduct(null)
   }
 
   const openContactFor = (interest = 'Orientação', product = 'Ainda não sei') => {
@@ -261,6 +277,8 @@ function App() {
     const details = [
       formData.name ? `Nome: ${formData.name}` : null,
       formData.phone ? `Telefone: ${formData.phone}` : null,
+      formData.city ? `Cidade de entrega: ${formData.city}` : null,
+      formData.period ? `Período de uso: ${formData.period}` : null,
       formData.message ? `Mensagem: ${formData.message}` : null,
     ].filter(Boolean).join('\n')
 
@@ -279,23 +297,24 @@ function App() {
 
   return (
     <div className="site-shell">
+      <a className="skip-link" href="#conteudo">Ir para o conteúdo</a>
       <header className="site-header">
         <div className="container header-inner">
           <BrandLogo />
-          <nav className={menuOpen ? 'nav nav--open' : 'nav'} aria-label="Navegação principal">
+          <nav id="menu-principal" className={menuOpen ? 'nav nav--open' : 'nav'} aria-label="Navegação principal">
             <a href="#produtos" onClick={() => setMenuOpen(false)}>Produtos</a>
             <a href="#comprar-alugar" onClick={() => setMenuOpen(false)}>Comprar ou alugar</a>
             <a href="#porque-yr" onClick={() => setMenuOpen(false)}>Por que YR</a>
             <a href="#faq" onClick={() => setMenuOpen(false)}>Dúvidas</a>
           </nav>
           <button className="header-cta" onClick={() => openContactFor('Orientação')}>Falar com a YR <Icon name="arrow" size={17} /></button>
-          <button className="menu-button" onClick={() => setMenuOpen((value) => !value)} aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'}>
+          <button className="menu-button" aria-expanded={menuOpen} aria-controls="menu-principal" onClick={() => setMenuOpen((value) => !value)} aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'}>
             <Icon name={menuOpen ? 'close' : 'menu'} size={24} />
           </button>
         </div>
       </header>
 
-      <main>
+      <main id="conteudo">
         <section className="hero" id="inicio">
           <div className="hero-glow hero-glow--one" />
           <div className="hero-glow hero-glow--two" />
@@ -304,12 +323,12 @@ function App() {
               <span className="kicker">Venda e locação de equipamentos hospitalares</span>
               <h1>Equipamentos certos. <em>Cuidado mais simples.</em></h1>
               <p>
-                Soluções para famílias, cuidadores, clínicas e hospitais com uma diferença importante:
-                você não precisa escolher sozinho.
+                Compre ou alugue equipamentos para o cuidado em casa e a rotina de clínicas e hospitais.
+                Conte com a YR para comparar opções e solicitar sua cotação.
               </p>
               <div className="hero-actions">
-                <a className="btn btn--primary" href="#produtos">Explorar produtos <Icon name="arrow" size={18} /></a>
-                <button className="btn btn--secondary" onClick={() => openContactFor('Orientação')}>Preciso de ajuda para escolher</button>
+                <button className="btn btn--primary" onClick={() => openContactFor('Cotação')}>Solicitar cotação <Icon name="arrow" size={18} /></button>
+                <a className="btn btn--secondary" href="#produtos">Explorar produtos <Icon name="arrow" size={18} /></a>
               </div>
               <div className="hero-proof">
                 <span><Icon name="check" size={17} /> Compra ou locação</span>
@@ -321,7 +340,7 @@ function App() {
             <div className="hero-visual" data-reveal>
               <div className="hero-visual__frame">
                 <div className="hero-visual__label">Cuidado hospitalar e home care</div>
-                <img src={heroBed} alt="Cama hospitalar articulada" />
+                <img src={heroBed} alt="Cama hospitalar articulada em ambiente de cuidado" width="800" height="623" fetchPriority="high" />
               </div>
               <div className="hero-floating hero-floating--top">
                 <span><Icon name="heart" size={19} /></span>
@@ -397,21 +416,26 @@ function App() {
           <div className="container">
             <div className="products-head" data-reveal>
               <div className="section-heading">
-                <span className="eyeline">Catálogo inicial</span>
+                <span className="eyeline">Encontre seu equipamento</span>
                 <h2>Soluções para cuidado, mobilidade e rotina hospitalar.</h2>
                 <p>Veja os principais itens e peça uma cotação personalizada para o seu cenário.</p>
               </div>
-              <div className="filter-tabs" role="tablist" aria-label="Filtrar produtos">
+              <div className="filter-tabs" role="group" aria-label="Filtrar produtos">
                 {[
                   ['todos', 'Todos'],
                   ['comprar', 'Comprar'],
                   ['alugar', 'Alugar'],
                 ].map(([value, label]) => (
-                  <button key={value} className={mode === value ? 'active' : ''} onClick={() => setMode(value)}>{label}</button>
+                  <button key={value} aria-pressed={mode === value} className={mode === value ? 'active' : ''} onClick={() => setMode(value)}>{label}</button>
                 ))}
               </div>
             </div>
 
+            <div className="catalog-tools">
+              <label className="catalog-search"><span>Buscar equipamento</span><input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Busque por cama, maca, biombo…" /></label>
+              <p aria-live="polite">{visibleProducts.length} {visibleProducts.length === 1 ? 'equipamento encontrado' : 'equipamentos encontrados'}</p>
+            </div>
+            {!visibleProducts.length && <div className="catalog-empty"><h3>Não encontrou o que procura?</h3><p>Fale com a equipe para consultar outros equipamentos.</p><button className="btn btn--primary" onClick={() => openContactFor('Orientação')}>Consultar a YR</button><button className="btn btn--secondary" onClick={() => { setQuery(''); setMode('todos') }}>Limpar filtros</button></div>}
             <div className="product-grid">
               {visibleProducts.map((product) => (
                 <article className={`product-card ${product.featured ? 'product-card--featured' : ''}`} key={product.id} data-reveal>
@@ -436,7 +460,7 @@ function App() {
                     <p>{product.description}</p>
                     <div className="product-actions">
                       <button className="product-link" onClick={() => setSelectedProduct(product)}>Ver detalhes <Icon name="arrow" size={16} /></button>
-                      <button className="product-quote" onClick={() => openContactFor(mode === 'alugar' ? 'Alugar' : 'Cotação', product.name)}>Pedir cotação</button>
+                      <button className="product-quote" onClick={() => openContactFor(mode === 'alugar' ? 'Alugar' : mode === 'comprar' ? 'Comprar' : 'Cotação', product.name)}>Pedir cotação</button>
                     </div>
                   </div>
                 </article>
@@ -589,6 +613,7 @@ function App() {
           <div className="footer-column">
             <strong>Contato</strong>
             <a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>
+            <a href={createContactUrl()}>WhatsApp: (41) 99724-4279</a>
             <button onClick={() => openContactFor('Orientação')}>Solicitar cotação</button>
           </div>
           <div className="footer-column">
@@ -653,11 +678,11 @@ function App() {
             <form className="contact-form" onSubmit={handleFormSubmit}>
               <label>
                 <span>Nome</span>
-                <input value={formData.name} onChange={(event) => setFormData((current) => ({ ...current, name: event.target.value }))} placeholder="Seu nome" required />
+                <input autoComplete="name" maxLength={100} value={formData.name} onChange={(event) => setFormData((current) => ({ ...current, name: event.target.value }))} placeholder="Seu nome" required />
               </label>
               <label>
                 <span>WhatsApp / telefone</span>
-                <input type="tel" value={formData.phone} onChange={(event) => setFormData((current) => ({ ...current, phone: event.target.value }))} placeholder="(00) 00000-0000" />
+                <input type="tel" autoComplete="tel" maxLength={25} value={formData.phone} onChange={(event) => setFormData((current) => ({ ...current, phone: event.target.value }))} placeholder="(00) 00000-0000" />
               </label>
               <div className="form-row">
                 <label>
@@ -677,11 +702,16 @@ function App() {
                   </select>
                 </label>
               </div>
+              <div className="form-row">
+                <label><span>Cidade de entrega</span><input autoComplete="address-level2" maxLength={100} value={formData.city} onChange={(event) => setFormData((current) => ({ ...current, city: event.target.value }))} placeholder="Cidade / UF" /></label>
+                <label><span>Tempo de uso previsto</span><input maxLength={80} value={formData.period} onChange={(event) => setFormData((current) => ({ ...current, period: event.target.value }))} placeholder="Ex.: 30 dias ou contínuo" /></label>
+              </div>
               <label>
                 <span>Mensagem</span>
-                <textarea rows="5" value={formData.message} onChange={(event) => setFormData((current) => ({ ...current, message: event.target.value }))} placeholder="Ex.: preciso para uso domiciliar por cerca de 60 dias..." required />
+                <textarea maxLength={1500} rows="4" value={formData.message} onChange={(event) => setFormData((current) => ({ ...current, message: event.target.value }))} placeholder="Ex.: preciso para uso domiciliar por cerca de 60 dias..." required />
               </label>
               <button className="btn btn--primary contact-submit" type="submit">{hasWhatsApp ? 'Continuar no WhatsApp' : 'Enviar solicitação'} <Icon name="arrow" size={18} /></button>
+              <small className="form-handoff">A mensagem será preparada no WhatsApp. Você revisa e envia para a equipe.</small>
               <small className="form-privacy">Ao enviar, você concorda com o uso dos dados para responder à sua solicitação. <button type="button" onClick={() => { setContactOpen(false); setLegalOpen('privacy') }}>Ver Política de Privacidade.</button></small>
             </form>
           </section>

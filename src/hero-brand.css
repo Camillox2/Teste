@@ -10,7 +10,7 @@
   border-radius: 50%;
   pointer-events: none;
   background:
-    url('/yr-logo.webp') center / 58% auto no-repeat,
+    url('/yr-hospitalar-logo.jpg') center / 58% auto no-repeat,
     radial-gradient(circle at 36% 34%, rgba(123, 214, 199, .42) 0%, rgba(72, 184, 168, .22) 35%, rgba(15, 118, 110, .10) 62%, rgba(15, 118, 110, 0) 74%);
   opacity: .32;
   mix-blend-mode: multiply;
@@ -34,8 +34,7 @@
   animation: yrHeroGlowDrift 10s ease-in-out infinite reverse;
 }
 
-.hero-grid,
-.hero-glow {
+.hero-grid {
   position: relative;
   z-index: 1;
 }
