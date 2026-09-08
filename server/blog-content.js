@@ -1,5 +1,5 @@
 import { marked } from 'marked'
-import sanitizeHtml from 'sanitize-html'
+import sanitizeHtml from './sanitizer.generated.mjs'
 import { fail, uuidPattern } from './blog-db.js'
 export const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))
 export function contentHtml(markdown) {
