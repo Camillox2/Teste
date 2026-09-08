@@ -6,6 +6,7 @@ import './assistant.css'
 import './experience-fixes.css'
 import './refinements.css'
 import './editorial.css'
+import './experience-v3.css'
 
 const root = document.getElementById('root')
 const page = <React.StrictMode><PageRouter path={window.location.pathname} /></React.StrictMode>

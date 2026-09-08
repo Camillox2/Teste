@@ -37,7 +37,7 @@ Valide o build com `node scripts/check-seo.mjs`. Use `npm run preview -- --host 
 
 ## Design e movimento
 
-Abertura panorâmica, catálogo editorial assimétrico e comparador de contexto. Animações nativas de entrada, revelação ao rolar, hover e transições de formulário. Conteúdo permanece legível sem os efeitos; `prefers-reduced-motion` desliga os movimentos. Fonte Manrope servida localmente, com licença em `public/fonts/OFL-Manrope.txt`. O guia envia o contexto ao formulário; páginas de equipamento levam somente produto e modalidade na URL. Dados pessoais não vão para parâmetros de URL.
+Galeria horizontal com rolagem nativa por toque, fotos vizinhas visíveis, encaixe central e controles por botão e teclado. O catálogo mantém os seis elementos e suas imagens montados ao filtrar; não há animação de entrada nem observador de revelação reiniciado pelos filtros. A logo usa integralmente a imagem original enviada, sem reconstrução tipográfica. Controles preenchidos, cartões arredondados e seções em azul-marinho compõem a experiência móvel e desktop. `prefers-reduced-motion` desliga as transições e a rolagem suave. Fonte Manrope servida localmente, com licença em `public/fonts/OFL-Manrope.txt`. O guia envia o contexto ao formulário; páginas de equipamento levam somente produto e modalidade na URL. Dados pessoais não vão para parâmetros de URL.
 
 ## Imagens
 
