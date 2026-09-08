@@ -39,5 +39,5 @@ try {
     await writeFile(output, html)
     console.log(`Prerendered ${path} (${Buffer.byteLength(html)} bytes)`)
   }
-  await writeFile('dist/sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${paths.map(path => `<url><loc>${siteConfig.url}${path === '/' ? '/' : path}</loc></url>`).join('')}</urlset>\n`)
+  await writeFile('dist/sitemap-pages.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${[...paths, '/blog'].map(path => `<url><loc>${siteConfig.url}${path === '/' ? '/' : path}</loc></url>`).join('')}</urlset>\n`)
 } finally { await server.close() }

@@ -28,13 +28,13 @@ for (const path of [...paths, '/404']) {
   }
   for(const [,raw] of html.matchAll(/(?:href|src)="(\/[^"?#]*)(?:[?#][^"]*)?"/g)) {
     if(raw.startsWith('//'))continue
-    if(paths.includes(raw)||raw==='/404')continue
+    if(paths.includes(raw)||raw==='/404'||raw==='/blog')continue
     await access(join('dist',raw)).catch(()=>assert.fail(`Missing local resource ${raw} on ${path}`))
   }
   console.log(`PASS ${path}: HTML, heading, metadata, JSON-LD and local links`)
 }
-const sitemap = await readFile('dist/sitemap.xml','utf8')
-assert.equal((sitemap.match(/<loc>/g)||[]).length, paths.length)
+const sitemap = await readFile('dist/sitemap-pages.xml','utf8')
+assert.equal((sitemap.match(/<loc>/g)||[]).length, paths.length + 1)
 for(const path of paths) assert(sitemap.includes(`<loc>${siteConfig.url}${path==='/'?'/':path}</loc>`))
 assert(!(await readFile('dist/robots.txt','utf8')).includes('Disallow: /\n'))
 console.log(`PASS sitemap (${paths.length} pages) and robots`)
