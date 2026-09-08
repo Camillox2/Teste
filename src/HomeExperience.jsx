@@ -1,28 +1,20 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { BrandLogo } from './App.jsx'
-import { products, faqs, productPath } from './catalog.js'
+import { faqs } from './catalog.js'
 import { siteConfig } from './config.js'
 import ProductCarousel from './ProductCarousel.jsx'
 import DecisionGuide from './DecisionGuide.jsx'
+import ShowroomCatalog from './ShowroomCatalog.jsx'
+import ProductInspector from './ProductInspector.jsx'
 
 export default function HomeExperience({onContact,onLegal,onGuide}) {
-  const [mode,setMode]=useState('todos')
-  const [query,setQuery]=useState('')
   const [menu,setMenu]=useState(false)
-  const normalized = text=>text.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase()
-  const visible = useMemo(()=>products.filter(product=>(mode!=='comprar'||product.sale)&&(mode!=='alugar'||product.rent)&&normalized(product.name+' '+product.category).includes(normalized(query.trim()))),[mode,query])
-  const visibleIds=new Set(visible.map(product=>product.id))
   return <div className="yr3">
-    <header className="yr3-header"><div className="yr3-width yr3-header-inner"><BrandLogo/><nav className={menu?'yr3-nav is-open':'yr3-nav'} id="yr3-menu" aria-label="Navegação principal">{[['#produtos','Equipamentos'],['#comprar-alugar','Compra ou locação'],['#porque-yr','A YR'],['#faq','Dúvidas']].map(([href,label])=><a key={href} href={href} onClick={()=>setMenu(false)}>{label}</a>)}</nav><button className="yr3-button yr3-header-contact" onClick={()=>onContact('Orientação')}>Vamos conversar <span aria-hidden="true">↗</span></button><button className="yr3-menu-toggle" onClick={()=>setMenu(value=>!value)} aria-label={menu?'Fechar menu':'Abrir menu'} aria-controls="yr3-menu" aria-expanded={menu}>{menu?'×':<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>}</button></div></header>
+    <header className="yr3-header"><div className="yr3-width yr3-header-inner"><BrandLogo/><nav className={menu?'yr3-nav is-open':'yr3-nav'} id="yr3-menu" aria-label="Navegação principal">{[['#produtos','Equipamentos'],['#conheca-de-perto','Conheça de perto'],['#comprar-alugar','Compra ou locação'],['#faq','Dúvidas']].map(([href,label])=><a key={href} href={href} onClick={()=>setMenu(false)}>{label}</a>)}</nav><button className="yr3-button yr3-header-contact" onClick={()=>onContact('Orientação')}>Vamos conversar <span aria-hidden="true">↗</span></button><button className="yr3-menu-toggle" onClick={()=>setMenu(value=>!value)} aria-label={menu?'Fechar menu':'Abrir menu'} aria-controls="yr3-menu" aria-expanded={menu}>{menu?'×':<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>}</button></div></header>
     <main id="conteudo">
-      <section className="yr3-hero" id="inicio"><div className="yr3-width yr3-hero-top"><div><p className="yr3-eyebrow">COMPRA E LOCAÇÃO</p><h1>Mais conforto.<br/><em>Mais possibilidades.</em></h1></div><div className="yr3-hero-intro"><p>Equipamentos hospitalares para o cuidado em casa e a rotina profissional.</p><a className="yr3-button yr3-button--white" href="#produtos">Encontrar meu equipamento <span aria-hidden="true">→</span></a></div></div><ProductCarousel/></section>
-
-      <section className="yr3-catalog yr3-section" id="produtos"><div className="yr3-width"><div className="yr3-section-heading"><div><p className="yr3-eyebrow">ESCOLHAS PARA CUIDAR</p><h2>Encontre seu equipamento.</h2></div><p>Escolha uma modalidade e explore as opções.</p></div>
-        <div className="yr3-catalog-controls"><div className="yr3-segments" role="group" aria-label="Filtrar produtos">{[['todos','Todos',products.length],['comprar','Comprar',products.filter(p=>p.sale).length],['alugar','Alugar',products.filter(p=>p.rent).length]].map(([value,label,count])=><button key={value} aria-label={label} aria-pressed={mode===value} className={mode===value?'is-active':''} onClick={()=>setMode(value)}>{label}<span aria-hidden="true">{count}</span></button>)}</div><label className="yr3-search"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><span className="sr-only">Buscar equipamento</span><input type="search" value={query} onChange={event=>setQuery(event.target.value)} placeholder="Buscar cama, maca, biombo…"/></label></div>
-        <p className="yr3-result-count" aria-live="polite">{visible.length} {visible.length===1?'equipamento encontrado':'equipamentos encontrados'}</p>
-        {!visible.length&&<div className="yr3-empty"><h3>Vamos encontrar uma alternativa?</h3><p>Consulte a equipe sobre o equipamento que você procura.</p><button className="yr3-button" onClick={()=>onContact('Orientação')}>Consultar a YR ↗</button><button className="yr3-button yr3-button--soft" onClick={()=>{setMode('todos');setQuery('')}}>Limpar filtros</button></div>}
-        <div className="yr3-product-grid">{products.map(product=><article className="yr3-product" key={product.id} data-product-id={product.id} hidden={!visibleIds.has(product.id)}><a className="yr3-product-image" href={productPath(product)} aria-label={`Conhecer ${product.name}`}><img src={product.image} alt={product.name} width="1000" height="1000" loading="lazy" decoding="async"/><span className="yr3-product-category">{product.category}</span></a><div className="yr3-product-body"><span className="yr3-product-mode">{product.rent?'Compra e locação':'Compra'}</span><h3><a href={productPath(product)}>{product.name}</a></h3><p>{product.description}</p><div className="yr3-product-actions"><button className="yr3-button" onClick={()=>onContact(mode==='alugar'?'Alugar':mode==='comprar'?'Comprar':'Cotação',product.name)}>Pedir cotação <span aria-hidden="true">→</span></button><a className="yr3-button yr3-button--soft" href={productPath(product)}>Ver detalhes <span aria-hidden="true">↗</span></a></div></div></article>)}</div>
-      </div></section>
+      <section className="yr3-hero" id="inicio"><div className="yr3-width yr3-hero-top"><div><h1>O cuidado começa<br/>com a <em>escolha certa.</em></h1></div><div className="yr3-hero-intro"><p>Equipamentos hospitalares para comprar ou alugar, em casa ou na sua clínica.</p><div className="showroom-hero-actions"><a className="yr3-button" href="#produtos">Explorar equipamentos <span aria-hidden="true">→</span></a><button className="yr3-button yr3-button--soft" onClick={()=>onContact('Orientação')}>Conversar com a YR <span aria-hidden="true">↗</span></button></div></div></div><ProductCarousel/></section>
+      <ShowroomCatalog onContact={onContact}/>
+      <ProductInspector/>
 
       <div className="yr3-guide"><DecisionGuide onContinue={onGuide}/></div>
 

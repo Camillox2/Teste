@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { siteConfig } from './config.js'
 import { products, faqs, productPath } from './catalog.js'
 import HomeExperience from './HomeExperience.jsx'
+import { useSelection, placeLabels } from './SelectionContext.jsx'
 
 const heroBed = '/products/cama-hospitalar.webp'
 const logoImage = '/yr-hospitalar-logo.jpg'
@@ -72,6 +73,7 @@ export function BrandLogo({ compact = false }) {
 }
 
 function App() {
+  const { selection, product: chosenEquipment } = useSelection()
   const [selectedProduct, setSelectedProduct] = useState(null)
   const [contactOpen, setContactOpen] = useState(false)
   const [legalOpen, setLegalOpen] = useState(null)
@@ -150,7 +152,7 @@ function App() {
   }
 
   const openContactFor = (interest = 'Orientação', product = 'Ainda não sei') => {
-    setFormData((current) => ({ ...current, interest, product }))
+    setFormData((current) => ({ ...current, interest, product: product === 'Ainda não sei' ? chosenEquipment?.name || product : product, period: current.period || selection.period, message: current.message || (selection.place !== 'all' ? `Local de uso: ${placeLabels[selection.place]}.` : '') }))
     setContactOpen(true)
   }
 
@@ -180,7 +182,7 @@ function App() {
   return (
     <div className="site-shell">
       <a className="skip-link" href="#conteudo">Ir para o conteúdo</a>
-      <HomeExperience onContact={openContactFor} onLegal={setLegalOpen} onGuide={context=>{setFormData(current=>({...current,interest:context.interest,period:context.period,message:context.message}));setContactOpen(true)}} />
+      <HomeExperience onContact={openContactFor} onLegal={setLegalOpen} onGuide={context=>{setFormData(current=>({...current,interest:chosenEquipment && !chosenEquipment.rent && context.interest === 'Alugar' ? 'Comprar' : context.interest,product:chosenEquipment?.name || current.product,period:context.period,message:context.message}));setContactOpen(true)}} />
 
       {selectedProduct ? (
         <div className="modal-backdrop" onMouseDown={() => setSelectedProduct(null)}>

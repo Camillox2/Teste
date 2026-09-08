@@ -1,4 +1,6 @@
 import App, { BrandLogo } from './App.jsx'
+import { SelectionProvider, useSelection } from './SelectionContext.jsx'
+import QuoteDock from './QuoteDock.jsx'
 import AssistantYR from './AssistantYR.jsx'
 import { products, productPath } from './catalog.js'
 import { siteConfig } from './config.js'
@@ -11,15 +13,15 @@ function PageFrame({ children }) {
     <footer className="detail-footer"><div className="container"><BrandLogo /><div><a href="/#produtos">Todos os equipamentos</a><a href="/comprar-ou-alugar">Guia de compra e locação</a><a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a><a href={`https://wa.me/${siteConfig.whatsapp}`}>WhatsApp: (41) 99724-4279</a></div><p>© 2026 Grupo YR Hospitalar. Modelos, disponibilidade e condições são confirmados na cotação.</p></div></footer></>
 }
 function Breadcrumb({ title }) { return <nav className="breadcrumb container" aria-label="Você está em"><a href="/">Início</a><span aria-hidden="true">/</span><span aria-current="page">{title}</span></nav> }
-const quotePath = (product, interest) => `/?produto=${product.slug}&interesse=${interest}#contato`
 
 function ProductPage({ product }) {
+  const { choose } = useSelection()
   const related = products.filter(item => item.id !== product.id).sort((a,b) => Number(b.category === product.category) - Number(a.category === product.category)).slice(0,3)
   return <PageFrame><Breadcrumb title={product.name} />
     <section className="container equipment-hero">
       <div className="equipment-image"><img src={product.image} alt={product.name} width="1000" height="1000" fetchPriority="high" /><span>Imagem de referência. Confirme o modelo na cotação.</span></div>
       <div className="equipment-copy"><p className="equipment-category">{product.category} / {product.rent ? 'Compra e locação' : 'Compra'}</p><h1>{product.name}</h1><p className="equipment-description">{product.description}</p><ul>{product.benefits.map(item => <li key={item}>{item}</li>)}</ul>
-        <div className="equipment-cta"><a className="btn btn--primary" href={quotePath(product,'comprar')}>Cotar compra <span aria-hidden="true">→</span></a>{product.rent && <a className="btn btn--secondary" href={quotePath(product,'alugar')}>Cotar locação <span aria-hidden="true">→</span></a>}</div>
+        <div className="equipment-cta"><button className="btn btn--primary" onClick={() => choose(product,'Comprar')}>Cotar compra <span aria-hidden="true">→</span></button>{product.rent && <button className="btn btn--secondary" onClick={() => choose(product,'Alugar')}>Cotar locação <span aria-hidden="true">→</span></button>}</div>
         <p className="equipment-note">Preço, modelo, disponibilidade e entrega sob consulta. Você recebe as condições antes de decidir.</p>
       </div>
     </section>
@@ -44,5 +46,5 @@ function NotFound() { return <PageFrame><section className="container not-found"
 export default function PageRouter({ path = '/' }) {
   const normalized = normalizePath(path)
   const product = products.find(item => productPath(item) === normalized)
-  return <>{normalized === '/' ? <App /> : product ? <ProductPage product={product} /> : normalized === '/comprar-ou-alugar' ? <ComparePage /> : <NotFound />}<AssistantYR /></>
+  return <SelectionProvider>{normalized === '/' ? <App /> : product ? <ProductPage product={product} /> : normalized === '/comprar-ou-alugar' ? <ComparePage /> : <NotFound />}<QuoteDock /><AssistantYR /></SelectionProvider>
 }
